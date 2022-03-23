@@ -14,7 +14,7 @@ const sender = {
 
 const client = new SMTPClient({
   user: sender.email,
-  password: "M@nzan@p0drid4",
+  password: import.meta.env.VITE_EMAIL_PASS,
   host: "smtp.ionos.es",
   ssl: true
 });
@@ -41,6 +41,25 @@ export async function post({ request }) {
       attachment: [
         { data: `<html>${sender.first_response}</html>`, alternative: true },
       ],
+    });
+
+    const req = await fetch(`https://api.github.com/repos/gaplogic/gap-the-funnel/actions/workflows`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `token ${import.meta.env.VITE_GH_TOKEN}`
+      }
+    });
+
+    const { workflows } = await req.json();
+    const { id } = workflows[0];
+
+    const req2 = await fetch(`https://api.github.com/repos/gaplogic/gap-the-funnel/actions/workflows/${id}/enable`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `token ${import.meta.env.VITE_GH_TOKEN}`
+      }
     });
 
     return {
