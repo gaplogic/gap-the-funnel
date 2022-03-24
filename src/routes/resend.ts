@@ -21,10 +21,21 @@ export async function get() {
       text: `Autoenvio completado`,
     });
 
-    const nite = new Date(1648067356967) // 2022-03-23T20:29:16.967Z;
+    const nite = new Date(1648116955509) // 2022-03-24T10:15:55.510Z
     const now = new Date();
 
     if (nite > now) {
+      const req = await fetch(`https://api.github.com/repos/gaplogic/gap-the-funnel/actions/workflows`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `token ${import.meta.env.VITE_GH_TOKEN}`
+        }
+      });
+
+      const { workflows } = await req.json();
+      const { id } = workflows[0];
+
       const disable = await fetch(`https://api.github.com/repos/gaplogic/gap-the-funnel/actions/workflows/${id}/disable`, {
         method: 'PUT',
         headers: {
